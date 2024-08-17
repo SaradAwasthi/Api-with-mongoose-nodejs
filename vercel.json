@@ -1,5 +1,16 @@
 {
     "version":2,
+    "functions": {
+    "api/test.js": {
+      "maxDuration": 30 
+    },
+    "api/*.js": {
+      "maxDuration": 15 
+    },
+    "index/*.js": {
+      "maxDuration": 25 
+    }
+  },
     "builds":[
         {
             "src":"index.js",

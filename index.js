@@ -54,51 +54,57 @@
 
 require('dotenv').config();
 const express = require("express");
-require("./config");
+require("./config/db");
 const app = express();
 const Products = require("./product_schema_model");
 const ObjectId = require("mongoose").ObjectId;
-
+const connectedToDatabase = require('./config/db')
 app.use(express.json());
 
-app.post("/create", async (req, res) => {
-  const data = new Products(req.body);
-  const result = await data.save();
-  res.send(result);
-  console.log(result);
-});
+// app.post("/create", async (req, res) => {
+//   const data = new Products(req.body);
+//   const result = await data.save();
+//   res.send(result);
+//   console.log(result);
+// });
 
 app.get("/products", async (req, res) => {
+  try {
+    await connectedToDatabase();
   const data = await Products.find();
   const length = data.length;
   const limit = parseInt(req.query.limit) || length;
-  res.send({total: length, limit: limit, result:data.slice(0,limit)});
+  res.status(200).send({total: length, limit: limit, result:data.slice(0,limit)});
+  } catch (error) {
+    res.status(500).send("Internal server")
+  }
+  
 });
 
-app.delete("/delete/:_id", async (req, res) => {
-  const result = await Products.deleteOne(req.params);
-  res.send(result);
-});
+// app.delete("/delete/:_id", async (req, res) => {
+//   const result = await Products.deleteOne(req.params);
+//   res.send(result);
+// });
 
-app.put("/update/:_id", async (req, res) => {
-  const result = await Products.updateOne(req.params, {
-    $set: req.body,
-  });
-  res.send(result);
-});
+// app.put("/update/:_id", async (req, res) => {
+//   const result = await Products.updateOne(req.params, {
+//     $set: req.body,
+//   });
+//   res.send(result);
+// });
 
 
 //Search Api
-app.get("/search/:key", async (req, res) => {
-  const data = await Products.find({
-    $or: [
-      { "item_name": { $regex: req.params.key } },
-      { "category": { $regex: req.params.key } }
-    ],
-  });
-  const length = data.length;
-  const limit = parseInt(req.query.limit) || length;
-  res.send({total:length, limit: limit ,results: data.slice(0, length)});
-});
+// app.get("/search/:key", async (req, res) => {
+//   const data = await Products.find({
+//     $or: [
+//       { "item_name": { $regex: req.params.key } },
+//       { "category": { $regex: req.params.key } }
+//     ],
+//   });
+//   const length = data.length;
+//   const limit = parseInt(req.query.limit) || length;
+//   res.send({total:length, limit: limit ,results: data.slice(0, length)});
+// });
 
 app.listen(process.env.PORT);
