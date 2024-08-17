@@ -52,6 +52,7 @@
 
 // fetchSingleProduct()
 
+require('dotenv').config();
 const express = require("express");
 require("./config");
 const app = express();
@@ -100,4 +101,4 @@ app.get("/search/:key", async (req, res) => {
   res.send({total:length, limit: limit ,results: data.slice(0, length)});
 });
 
-app.listen(5000);
+app.listen(process.env.PORT);
